@@ -1,0 +1,13 @@
+conf t
+archive
+log config
+logging enable
+exit
+exit
+end
+wri
+
+!show archive log config all
+
+exit
+

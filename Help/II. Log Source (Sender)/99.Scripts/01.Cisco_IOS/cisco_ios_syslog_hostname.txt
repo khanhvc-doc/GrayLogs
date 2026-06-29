@@ -1,0 +1,21 @@
+conf t
+
+logging origin-id hostname
+
+logging host 192.168.0.111 transport udp port 1514
+logging trap informational
+
+service timestamps debug datetime msec show-timezone
+service timestamps log datetime msec show-timezone
+
+logging source-interface Vlan1     
+
+logging facility local6         
+     
+logging buffered 16384 informational  
+
+logging on
+
+end
+wri
+exit
