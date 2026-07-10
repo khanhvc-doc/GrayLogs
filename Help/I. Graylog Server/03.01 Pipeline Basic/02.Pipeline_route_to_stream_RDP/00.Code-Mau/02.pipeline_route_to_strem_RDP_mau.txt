@@ -1,0 +1,30 @@
+rule "vck_RDP_monitor_connection_success"
+    // Remote Desktop thành công, dựa vào EventID 1149
+when
+    // 1. Chỉ định đúng kênh của dịch vụ RDP
+    has_field("winlogbeat_winlog_channel") AND
+    to_string($message.winlogbeat_winlog_channel) == "Microsoft-Windows-TerminalServices-RemoteConnectionManager/Operational" AND
+    
+    // 2. Bắt đúng Event ID 1149
+    has_field("winlogbeat_winlog_event_id") AND
+    to_string($message.winlogbeat_winlog_event_id) == "1149"
+then
+    // Trích xuất trực tiếp từ các tham số có sẵn
+    let target_user = to_string($message.winlogbeat_winlog_user_data_Param1);
+    let remote_ip = to_string($message.winlogbeat_winlog_user_data_Param3);
+    
+            // Host nhận kết nối
+    let host_dest = to_string($message.gl2_remote_ip);
+    
+    // Gắn thẻ phân loại (Để mức INFO vì đây là kết nối thành công, có thể là quản trị viên đang làm việc)
+    set_field("vck_security_alert", "INFO");
+    set_field("vck_threat_category", "RDP_Connection_Success");
+    
+    // Đẩy ra field mới để phục vụ thống kê Dashboard
+    set_field("vck_remote_ip", remote_ip);
+    set_field("vck_target_user", target_user);
+    set_field("vck_host_dest", host_dest);
+    
+        // ĐIỂM MẤU CHỐT: chủ động đẩy message vào stream đích
+    route_to_stream(name: "00_HSV_RDP_success");
+end

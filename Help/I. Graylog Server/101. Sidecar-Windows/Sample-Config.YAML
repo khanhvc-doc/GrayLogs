@@ -1,0 +1,51 @@
+# Graylog Sidecar Winlogbeat
+
+fields_under_root: true
+
+fields.collector_node_id: ${sidecar.nodeName}
+fields.gl2_source_collector: ${sidecar.nodeId}
+
+
+output.logstash:
+  hosts:
+    - "${user.graylog_host}:5044"
+
+
+path:
+  data: '${sidecar.spoolDir!"C:\\Program Files\\Graylog\\sidecar\\cache\\winlogbeat"}\data'
+  logs: '${sidecar.spoolDir!"C:\\Program Files\\Graylog\\sidecar"}\logs'
+
+
+tags:
+ - vck_windows
+ 
+winlogbeat:
+  event_logs:
+   - name: Security
+     event_id: 
+      4624,
+      4625,
+      4672,
+      4740,
+      4720,
+      4726,
+      4732,
+      4728,
+      4738,
+      5136,
+      5140,
+      1102,
+      4688
+
+  
+    # Kênh này dùng để bắt Event 1149 (RDP Connection Initialization)
+   - name: Microsoft-Windows-TerminalServices-RemoteConnectionManager/Operational
+     event_id: 1149
+     
+
+     
+processors:
+  - add_host_metadata:
+      netinfo.enabled: true
+
+ 

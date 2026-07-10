@@ -1,0 +1,7 @@
+rule "vck_classify_logon_failure"
+when
+    has_field("winlogbeat_winlog_event_id") AND 
+    to_string($message.winlogbeat_winlog_event_id) == "4625"
+then
+    set_field("logon_result", "failure");
+end

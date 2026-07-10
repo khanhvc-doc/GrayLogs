@@ -1,0 +1,15 @@
+rule "vck_normalize_source_hostname_ip"
+when
+    has_field("winlogbeat_host_hostname") AND has_field("winlogbeat_collector_node_id")
+then
+    // 1. Lấy giá trị của hostname và ip
+    let host = to_string($message.winlogbeat_collector_node_id);
+    let ip = to_string($message.gl2_remote_ip);
+    
+    // 2. Nối chuỗi: "hsv_" + host + "_IP_" + ip
+    let prefix = concat("hsv_", host);
+    let final_source = concat(concat(prefix, "_IP_"), ip);
+    
+    // 3. Ghi đè vào trường source
+    set_field("source", final_source);
+end
